@@ -5,5 +5,6 @@ data class GameItem(
     val name: String,
     val iconUrl: String?,
     val baseEarningsPerHour: Double = 0.0, // €/h at Q100% and C100%
-    val baseOutputPerHour: Double = 0.0    // m3/h at Q100% and C100%
+    val baseOutputPerHour: Double = 0.0,    // m3/h at Q100% and C100%
+    val baseMineCost: Double = 0.0          // Base cost to build the first mine
 )

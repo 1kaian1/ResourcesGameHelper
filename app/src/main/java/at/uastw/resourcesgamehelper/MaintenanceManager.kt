@@ -4,35 +4,73 @@ import android.content.Context
 import android.content.SharedPreferences
 
 class MaintenanceManager(context: Context) {
-    private val prefs: SharedPreferences = context.getSharedPreferences("maintenance_history", Context.MODE_PRIVATE)
+    private val prefs: SharedPreferences = context.getSharedPreferences("mine_maintenance_history_v3", Context.MODE_PRIVATE)
+    private val hqPrefs: SharedPreferences = context.getSharedPreferences("hq_data", Context.MODE_PRIVATE)
 
-    fun getHistory(mineID: Int): List<Long> {
-        val historyString = prefs.getString(mineID.toString(), null) ?: return emptyList()
-        return historyString.split(",").mapNotNull { it.toLongOrNull() }.sorted()
+    private fun getMineKey(mine: Mine): String = "${mine.lat}_${mine.lon}"
+
+    fun getHistory(mine: Mine): List<Long> {
+        val key = getMineKey(mine)
+        val historyString = prefs.getString(key, null) ?: return emptyList()
+        return historyString.split(",")
+            .mapNotNull { it.toLongOrNull() }
+            .distinct()
+            .sorted()
     }
 
-    fun addMaintenance(mineID: Int, timestamp: Long) {
-        val currentHistory = getHistory(mineID).toMutableList()
+    fun addMaintenance(mine: Mine, timestamp: Long) {
+        if (timestamp <= 0) return
+        val key = getMineKey(mine)
+        val currentHistory = getHistory(mine).toMutableList()
         if (!currentHistory.contains(timestamp)) {
             currentHistory.add(timestamp)
             currentHistory.sort()
-            prefs.edit().putString(mineID.toString(), currentHistory.joinToString(",")).apply()
+            saveHistory(key, currentHistory)
         }
     }
 
-    /**
-     * Ensures that the maintenance from API and the manual one are recorded.
-     */
+    fun removePoint(mine: Mine, timestamp: Long) {
+        val key = getMineKey(mine)
+        val currentHistory = getHistory(mine).toMutableList()
+        if (currentHistory.remove(timestamp)) {
+            saveHistory(key, currentHistory)
+        }
+    }
+
+    fun clearHistory(mine: Mine) {
+        prefs.edit().remove(getMineKey(mine)).commit()
+    }
+
+    private fun saveHistory(key: String, history: List<Long>) {
+        prefs.edit().putString(key, history.joinToString(",")).commit()
+    }
+
     fun syncWithApi(mine: Mine) {
-        addMaintenance(mine.mineID, mine.lastmaintenance)
-        
-        // Add the specific requested maintenance: 26.2.2026 20:24
-        // 26.2.2026 20:24:00 is approx 1772133840 seconds
+        addMaintenance(mine, mine.lastmaintenance)
         val manualTimestamp = 1772133840L 
-        if (mine.builddate < manualTimestamp && manualTimestamp <= System.currentTimeMillis() / 1000) {
-             // Only add if it makes sense for this mine (built before this date)
-             // For simplicity, we'll just add it as requested for testing
-             addMaintenance(mine.mineID, manualTimestamp)
+        if (mine.builddate < manualTimestamp) {
+             addMaintenance(mine, manualTimestamp)
+        }
+    }
+
+    // HQ Persistence
+    fun saveBestHq(lat: Double, lon: Double, count: Int) {
+        hqPrefs.edit()
+            .putString("lat", lat.toString())
+            .putString("lon", lon.toString())
+            .putInt("count", count)
+            .commit()
+    }
+
+    fun loadBestHq(): Pair<Pair<Double, Double>?, Int> {
+        val latStr = hqPrefs.getString("lat", null)
+        val lonStr = hqPrefs.getString("lon", null)
+        val count = hqPrefs.getInt("count", 0)
+        
+        return if (latStr != null && lonStr != null) {
+            Pair(Pair(latStr.toDouble(), lonStr.toDouble()), count)
+        } else {
+            Pair(null, 0)
         }
     }
 }

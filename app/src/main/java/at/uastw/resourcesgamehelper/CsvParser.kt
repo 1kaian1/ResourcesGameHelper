@@ -6,28 +6,13 @@ object CsvParser {
     private const val TAG = "CsvParser"
 
     fun parseMines(csvData: String): List<Mine> {
-        if (csvData.isBlank()) {
-            Log.w(TAG, "Received empty CSV data")
-            return emptyList()
-        }
-
+        if (csvData.isBlank()) return emptyList()
         val lines = csvData.trim().split("\n")
-        Log.d(TAG, "Total lines received: ${lines.size}")
+        if (lines.size <= 1) return emptyList()
         
-        if (lines.size <= 1) {
-            Log.w(TAG, "CSV contains only header or is empty: $csvData")
-            return emptyList()
-        }
+        val delimiter = if (lines[0].contains(";")) ";" else if (lines[0].contains("\t")) "\t" else ","
 
-        // Detect delimiter (comma or semicolon)
-        val firstLine = lines[0]
-        val delimiter = if (firstLine.contains(";")) ";" else ","
-        Log.d(TAG, "Detected delimiter: '$delimiter'")
-
-        // Skip header
-        val parsedMines = lines.drop(1).mapNotNull { line ->
-            // Use regex or a more sophisticated split to handle quoted commas if necessary, 
-            // but for this API simple split is usually enough if names don't contain delimiter.
+        return lines.drop(1).mapNotNull { line ->
             val parts = line.split(delimiter)
             if (parts.size >= 22) {
                 try {
@@ -43,7 +28,7 @@ object CsvParser {
                         builddate = parts[8].trim().toDouble().toLong(),
                         lastmaintenance = parts[9].trim().toDouble().toLong(),
                         condition = parts[10].trim().toDouble(),
-                        resourceName = parts[11].trim(),
+                        resourceName = parts[11].trim().removeSurrounding("\""), // Clean quotes here
                         resourceID = parts[12].trim().toDouble().toInt(),
                         lastenemyaction = parts[13].trim().toDouble().toLong(),
                         def1 = parts[14].trim().toDouble().toInt(),
@@ -55,19 +40,61 @@ object CsvParser {
                         quality = parts[20].trim().toDouble(),
                         qualityInclTU = parts[21].trim().toDouble()
                     )
-                } catch (e: Exception) {
-                    Log.e(TAG, "Error parsing line: $line", e)
-                    null
-                }
-            } else {
-                if (line.isNotBlank()) {
-                    Log.w(TAG, "Line has insufficient parts (${parts.size}): $line")
-                }
-                null
+                } catch (e: Exception) { null }
+            } else null
+        }
+    }
+
+    fun parseItemPrices(csvData: String): Map<Int, Double> {
+        val prices = mutableMapOf<Int, Double>()
+        val lines = csvData.trim().split("\n")
+        if (lines.size <= 1) return prices
+        
+        val delimiter = if (lines[0].contains(";")) ";" else if (lines[0].contains("\t")) "\t" else ","
+        
+        lines.drop(1).forEach { line ->
+            val parts = line.split(delimiter)
+            if (parts.size >= 4) {
+                try {
+                    val id = parts[0].trim().toInt()
+                    val kiPrice = parts[2].trim().toDouble()
+                    val marketPrice = parts[3].trim().toDouble()
+                    prices[id] = if (marketPrice > 0) marketPrice else kiPrice
+                } catch (e: Exception) {}
             }
         }
+        return prices
+    }
+
+    fun parseProductionData(csvData: String): List<ProductionData> {
+        val list = mutableListOf<ProductionData>()
+        val lines = csvData.trim().split("\n")
+        if (lines.size <= 1) return list
         
-        Log.d(TAG, "Successfully parsed ${parsedMines.size} mines")
-        return parsedMines
+        val delimiter = if (lines[0].contains(";")) ";" else if (lines[0].contains("\t")) "\t" else ","
+        
+        lines.drop(1).forEach { line ->
+            val parts = line.split(delimiter)
+            if (parts.size >= 13) {
+                try {
+                    list.add(ProductionData(
+                        outputItemId = parts[0].trim().toInt(),
+                        itemName = parts[1].trim().removeSurrounding("\""),
+                        factoryId = parts[2].trim().toInt(),
+                        factoryName = parts[3].trim().removeSurrounding("\""),
+                        baseOutputPerHour = parts[4].trim().toDouble(),
+                        outputPerCycle = parts[5].trim().toDouble(),
+                        creditsPerCycle = parts[6].trim().toDouble(),
+                        input1Id = parts[7].trim().toIntOrNull(),
+                        input1Qty = parts[8].trim().toDoubleOrNull() ?: 0.0,
+                        input2Id = parts[9].trim().toIntOrNull(),
+                        input2Qty = parts[10].trim().toDoubleOrNull() ?: 0.0,
+                        input3Id = parts[11].trim().toIntOrNull(),
+                        input3Qty = parts[12].trim().toDoubleOrNull() ?: 0.0
+                    ))
+                } catch (e: Exception) {}
+            }
+        }
+        return list
     }
 }

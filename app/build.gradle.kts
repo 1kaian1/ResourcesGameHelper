@@ -47,6 +47,9 @@ dependencies {
     implementation(libs.androidx.compose.material3)
     implementation(libs.androidx.compose.material3.adaptive.navigation.suite)
     
+    // Extended icons for ContentCopy
+    implementation("androidx.compose.material:material-icons-extended")
+    
     implementation(libs.retrofit)
     implementation(libs.retrofit.scalars)
     implementation(libs.okhttp)
