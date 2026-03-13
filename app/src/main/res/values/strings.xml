@@ -1,3 +1,63 @@
 <resources>
     <string name="app_name">ResourcesGameHelper</string>
+    <string name="tab_mines">Mines</string>
+    <string name="tab_factories">Factories</string>
+    <string name="tab_costs">Costs</string>
+    <string name="tab_hq">HQ</string>
+    <string name="tab_profile">Profile</string>
+
+    <string name="no_mines_found">No mines found. Press refresh to load.</string>
+    <string name="refresh">Refresh</string>
+    <string name="mines_management">Mines Management</string>
+    <string name="sort_label">Sort: %1$s</string>
+    <string name="sort_order">Sort Order</string>
+
+    <string name="sort_resources">Resources</string>
+    <string name="sort_quality">Quality</string>
+    <string name="sort_condition">Condition</string>
+    <string name="sort_defense">Defense</string>
+    <string name="sort_profit">Profit</string>
+    <string name="sort_revenue">Revenue</string>
+    <string name="sort_cost">Cost</string>
+
+    <string name="output_label">Output: %1$s m³/h</string>
+    <string name="defense_quality_label">Def: %1$d/%2$d/%3$d | Q: %4$d%%</string>
+    <string name="unique_id_label">Unique ID: %1$.6f, %2$.6f</string>
+    <string name="condition_label">Condition</string>
+    <string name="cond_short">Cond.</string>
+
+    <string name="total_earnings_est">Total Earnings Estimated</string>
+    <string name="current_output">Current Output</string>
+    <string name="current_income">Current Income</string>
+    <string name="current_loss">Current Loss</string>
+    <string name="hq_boost_label">HQ Boost: x%1$.1f</string>
+    <string name="defenses_label">Defenses (1/2/3): %1$d / %2$d / %3$d</string>
+
+    <string name="chart_condition">Condition (%)</string>
+    <string name="chart_income">Income (€/h)</string>
+    <string name="chart_loss">Loss (€/h)</string>
+
+    <string name="maintenance_history">Maintenance History</string>
+    <string name="clear_all">Clear All</string>
+    <string name="no_history">No history recorded.</string>
+    <string name="copied">Copied!</string>
+
+    <string name="calculating_hq">Calculating best location...</string>
+    <string name="theoretical_max_mines">Theoretical Max Mines</string>
+    <string name="hq_spacing_desc">In 145m radius with 30.5m spacing</string>
+    <string name="best_hq_location">Your Best HQ Location</string>
+    <string name="mines_in_radius">Mines in radius:</string>
+    <string name="lat_label">Lat: %1$.6f</string>
+    <string name="lon_label">Lon: %1$.6f</string>
+    <string name="find_hq">Find Best HQ Location</string>
+    <string name="recalculate">Recalculate</string>
+
+    <string name="total_mines_owned">Total mines owned: %1$d</string>
+    <string name="next_mine_price_desc">Price of the next mine (+2%% of base cost per existing mine)</string>
+    <string name="produces_label">Produces: %1$s</string>
+    <string name="profit_label">Profit: %1$s/h</string>
+    <string name="rev_short">Rev: %1$s</string>
+    <string name="cost_short">Cost: %1$s</string>
+    <string name="built_label">Built</string>
+    <string name="now_label">Now</string>
 </resources>

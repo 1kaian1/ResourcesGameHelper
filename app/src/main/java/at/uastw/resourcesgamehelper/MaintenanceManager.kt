@@ -53,7 +53,6 @@ class MaintenanceManager(context: Context) {
         }
     }
 
-    // HQ Persistence
     fun saveBestHq(lat: Double, lon: Double, count: Int) {
         hqPrefs.edit()
             .putString("lat", lat.toString())
@@ -66,7 +65,6 @@ class MaintenanceManager(context: Context) {
         val latStr = hqPrefs.getString("lat", null)
         val lonStr = hqPrefs.getString("lon", null)
         val count = hqPrefs.getInt("count", 0)
-        
         return if (latStr != null && lonStr != null) {
             Pair(Pair(latStr.toDouble(), lonStr.toDouble()), count)
         } else {
